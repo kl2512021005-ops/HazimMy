@@ -1,0 +1,1276 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  ShoppingBag, Store, Search, Home as HomeIcon, List, 
+  User, Plus, Edit, Trash2, Sparkles, X, Menu, 
+  ChevronRight, Star, ShoppingCart, Package, Info, CheckCircle, Globe,
+  Heart, ShieldCheck, Truck, Users, Tag, Rocket
+} from 'lucide-react';
+
+const INITIAL_PRODUCTS = [
+  {
+    id: 1,
+    name: "Handcrafted Batik Shirt",
+    name_ms: "Kemeja Batik Buatan Tangan",
+    description: "Authentic Malaysian batik shirt made with premium cotton. Perfect for formal and casual events.",
+    description_ms: "Kemeja batik Malaysia asli yang diperbuat daripada kapas premium. Sesuai untuk acara formal dan kasual.",
+    category: "Clothing",
+    price: 120.00,
+    stock: 50,
+    image: "https://images.unsplash.com/photo-1596755094514-f87e32f85e2c?auto=format&fit=crop&q=80&w=400",
+    seller: "Kraf Tradisi",
+    rating: 4.8
+  },
+  {
+    id: 2,
+    name: "Sambal Garing Bilis",
+    name_ms: "Sambal Garing Bilis",
+    description: "Spicy and crispy anchovy sambal. A must-have condiment for every meal.",
+    description_ms: "Sambal ikan bilis yang pedas dan rangup. Perasa yang wajib ada untuk setiap hidangan.",
+    category: "Food",
+    price: 15.50,
+    stock: 100,
+    image: "https://images.unsplash.com/photo-1596649283737-1c8810e91244?auto=format&fit=crop&q=80&w=400",
+    seller: "Makcik Kitchen",
+    rating: 4.9
+  },
+  {
+    id: 3,
+    name: "Rattan Woven Basket",
+    name_ms: "Bakul Anyaman Rotan",
+    description: "Eco-friendly handmade rattan basket. Great for storage or decoration.",
+    description_ms: "Bakul rotan buatan tangan mesra alam. Sesuai untuk penyimpanan atau hiasan.",
+    category: "Home & Living",
+    price: 45.00,
+    stock: 20,
+    image: "https://images.unsplash.com/photo-1598908314732-07113901949e?auto=format&fit=crop&q=80&w=400",
+    seller: "EcoDeco",
+    rating: 4.5
+  },
+  {
+    id: 4,
+    name: "Herbal Hair Oil",
+    name_ms: "Minyak Rambut Herba",
+    description: "Natural herbal formulation to promote hair growth and scalp health.",
+    description_ms: "Formulasi herba semulajadi untuk menggalakkan pertumbuhan rambut dan kesihatan kulit kepala.",
+    category: "Beauty",
+    price: 28.90,
+    stock: 75,
+    image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&q=80&w=400",
+    seller: "Aura Herbs",
+    rating: 4.7
+  }
+];
+
+const CATEGORIES = {
+  "All": "Semua",
+  "Clothing": "Pakaian",
+  "Food": "Makanan",
+  "Home & Living": "Rumah & Kehidupan",
+  "Beauty": "Kecantikan",
+  "Accessories": "Aksesori"
+};
+
+const TRANSLATIONS = {
+  en: {
+    home: "Home",
+    marketplace: "Marketplace",
+    sell: "Sell",
+    ai_assistant: "AI Assistant",
+    orders: "My Orders",
+    cart: "Cart",
+    empowering_title: "Empowering Community Entrepreneurs",
+    empowering_desc: "Discover authentic, community-crafted products. Join our marketplace as a BKAT or AIM entrepreneur and grow your business with our AI-powered tools.",
+    shop_now: "Shop Now",
+    stats_sellers: "Local Sellers",
+    stats_products: "Unique Products",
+    stats_buyers: "Happy Buyers",
+    why_us_title: "Why Choose Community Hub?",
+    feature_1_title: "100% Authentic",
+    feature_1_desc: "Directly from local artisans and entrepreneurs.",
+    feature_2_title: "Secure Payments",
+    feature_2_desc: "Your transactions are strictly protected.",
+    feature_3_title: "Fast Delivery",
+    feature_3_desc: "Reliable shipping all across Malaysia.",
+    promo_title: "Support Local Month! 🎉",
+    promo_desc: "Get up to 20% off on selected traditional crafts and local delicacies.",
+    claim_offer: "Claim Offer",
+    product_categories: "Product Categories",
+    featured_products: "Featured Products",
+    search_placeholder: "Search products...",
+    categories: "Categories",
+    no_products: "No products found",
+    try_adjusting: "Try adjusting your search or filters.",
+    back_to_marketplace: "Back to Marketplace",
+    rating: "Rating",
+    sold_by: "Sold by",
+    quantity: "Quantity",
+    available: "available",
+    add_to_cart: "Add to Cart",
+    shopping_cart: "Shopping Cart",
+    cart_empty: "Your cart is empty",
+    continue_shopping: "Continue Shopping",
+    order_summary: "Order Summary",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "Free",
+    total: "Total",
+    shipping_info: "Shipping Information",
+    full_name: "Full Name",
+    delivery_address: "Delivery Address",
+    phone_number: "Phone Number",
+    confirm_checkout: "Confirm Checkout",
+    order_history: "Order History",
+    no_orders: "You haven't placed any orders yet.",
+    order_id: "Order ID",
+    date: "Date",
+    items: "Items",
+    delivering_to: "Delivering to",
+    become_seller: "Become a Seller",
+    join_desc: "Join Community Hub and reach thousands of customers across Malaysia.",
+    seller_type: "Seller Type",
+    store_name: "Store Name",
+    profile_photo: "Profile Photo URL (Optional)",
+    register_store: "Register Store",
+    my_products: "My Products",
+    no_added_products: "You haven't added any products yet.",
+    product: "Product",
+    category: "Category",
+    price: "Price",
+    stock: "Stock",
+    actions: "Actions",
+    add_new_product: "Add New Product",
+    edit_product: "Edit Product",
+    product_name: "Product Name",
+    description: "Description",
+    image_url: "Image URL",
+    cancel: "Cancel",
+    save_product: "Save Product",
+    ai_title: "AI Business Assistant",
+    ai_desc: "Struggling with product descriptions? Let our AI write them for you instantly.",
+    ai_placeholder: "Enter your product name (e.g. Handmade Soap, Batik Shirt)",
+    generate_magic: "Generate Magic",
+    generating: "Generating...",
+    generated_content: "Generated Content",
+    product_title: "Product Title",
+    suggested_price: "Suggested Price",
+    marketing_caption: "Marketing Caption (For Social Media)",
+    seo_keywords: "SEO Keywords",
+    hashtags: "Hashtags",
+    use_in_new_product: "Use in New Product",
+    added_to_cart: "added to cart!",
+    order_placed: "Order placed successfully!",
+    store_registered: "Store registered successfully!",
+    product_updated: "Product updated!",
+    product_added: "Product added!",
+    product_deleted: "Product deleted!",
+    content_copied: "Content copied to product form!",
+    footer_desc: "Empowering local sellers, BAKAT, and AIM Entrepreneurs across Malaysia.",
+    about_us: "About Us",
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
+    all_rights: "All rights reserved.",
+    
+    // New exact UI text
+    support_local_heroes: "SUPPORT LOCAL HEROES",
+    become_seller_btn: "Become a Seller",
+    verified_sellers: "Verified Sellers",
+    verified_sellers_desc: "BKAT & AIM Programs",
+    fast_delivery: "Fast Delivery",
+    fast_delivery_desc: "Nationwide Shipping",
+    ai_tools: "AI Assistant",
+    ai_tools_desc: "Smart Business Tools",
+    impact: "100% Impact",
+    impact_desc: "Support Local Families"
+  },
+  ms: {
+    home: "Laman Utama",
+    marketplace: "Pasaran",
+    sell: "Ruang Penjual",
+    ai_assistant: "Pembantu AI",
+    orders: "Pesanan Saya",
+    cart: "Troli",
+    empowering_title: "Memperkasakan Usahawan Komuniti",
+    empowering_desc: "Terokai produk asli buatan komuniti. Sertai pasaran kami sebagai usahawan BAKAT atau AIM dan kembangkan perniagaan anda dengan alatan berkuasa AI kami.",
+    shop_now: "Beli Sekarang",
+    stats_sellers: "Penjual Tempatan",
+    stats_products: "Produk Unik",
+    stats_buyers: "Pembeli Berpuas Hati",
+    why_us_title: "Kenapa Pilih Community Hub?",
+    feature_1_title: "100% Asli",
+    feature_1_desc: "Terus daripada artisan dan usahawan tempatan.",
+    feature_2_title: "Pembayaran Selamat",
+    feature_2_desc: "Transaksi anda dilindungi sepenuhnya.",
+    feature_3_title: "Penghantaran Pantas",
+    feature_3_desc: "Penghantaran yang boleh dipercayai di seluruh Malaysia.",
+    promo_title: "Bulan Sokong Lokal! 🎉",
+    promo_desc: "Dapatkan diskaun sehingga 20% untuk kraf tradisional dan makanan tempatan terpilih.",
+    claim_offer: "Tuntut Tawaran",
+    product_categories: "Kategori Produk",
+    featured_products: "Produk Pilihan",
+    search_placeholder: "Cari produk...",
+    categories: "Kategori",
+    no_products: "Tiada produk ditemui",
+    try_adjusting: "Cuba laraskan carian atau penapis anda.",
+    back_to_marketplace: "Kembali ke Pasaran",
+    rating: "Penilaian",
+    sold_by: "Dijual oleh",
+    quantity: "Kuantiti",
+    available: "tersedia",
+    add_to_cart: "Tambah ke Troli",
+    shopping_cart: "Troli Membeli-belah",
+    cart_empty: "Troli anda kosong",
+    continue_shopping: "Teruskan Membeli-belah",
+    order_summary: "Ringkasan Pesanan",
+    subtotal: "Jumlah Kecil",
+    shipping: "Penghantaran",
+    free: "Percuma",
+    total: "Jumlah",
+    shipping_info: "Maklumat Penghantaran",
+    full_name: "Nama Penuh",
+    delivery_address: "Alamat Penghantaran",
+    phone_number: "Nombor Telefon",
+    confirm_checkout: "Sahkan Pembayaran",
+    order_history: "Sejarah Pesanan",
+    no_orders: "Anda belum membuat sebarang pesanan lagi.",
+    order_id: "ID Pesanan",
+    date: "Tarikh",
+    items: "Barangan",
+    delivering_to: "Dihantar ke",
+    become_seller: "Menjadi Penjual",
+    join_desc: "Sertai Community Hub dan capai ribuan pelanggan di seluruh Malaysia.",
+    seller_type: "Jenis Penjual",
+    store_name: "Nama Kedai",
+    profile_photo: "URL Foto Profil (Pilihan)",
+    register_store: "Daftar Kedai",
+    my_products: "Produk Saya",
+    no_added_products: "Anda belum menambah sebarang produk lagi.",
+    product: "Produk",
+    category: "Kategori",
+    price: "Harga",
+    stock: "Stok",
+    actions: "Tindakan",
+    add_new_product: "Tambah Produk Baru",
+    edit_product: "Edit Produk",
+    product_name: "Nama Produk",
+    description: "Penerangan",
+    image_url: "URL Gambar",
+    cancel: "Batal",
+    save_product: "Simpan Produk",
+    ai_title: "Pembantu Perniagaan AI",
+    ai_desc: "Sukar menulis penerangan produk? Biarkan AI kami menulisnya untuk anda serta-merta.",
+    ai_placeholder: "Masukkan nama produk anda (cth. Sabun Buatan Tangan, Kemeja Batik)",
+    generate_magic: "Jana Keajaiban",
+    generating: "Menjana...",
+    generated_content: "Kandungan Dijana",
+    product_title: "Tajuk Produk",
+    suggested_price: "Harga Dicadangkan",
+    marketing_caption: "Kapsyen Pemasaran (Untuk Media Sosial)",
+    seo_keywords: "Kata Kunci SEO",
+    hashtags: "Tanda Pagar",
+    use_in_new_product: "Gunakan dalam Produk Baru",
+    added_to_cart: "ditambah ke troli!",
+    order_placed: "Pesanan berjaya dibuat!",
+    store_registered: "Kedai berjaya didaftarkan!",
+    product_updated: "Produk dikemas kini!",
+    product_added: "Produk ditambah!",
+    product_deleted: "Produk dipadam!",
+    content_copied: "Kandungan disalin ke borang produk!",
+    footer_desc: "Memperkasakan penjual tempatan, usahawan BAKAT, dan AIM di seluruh Malaysia.",
+    about_us: "Tentang Kami",
+    terms: "Terma Perkhidmatan",
+    privacy: "Dasar Privasi",
+    all_rights: "Hak cipta terpelihara.",
+
+    // New exact UI text
+    support_local_heroes: "SOKONG WIRA LOKAL",
+    become_seller_btn: "Menjadi Penjual",
+    verified_sellers: "Penjual Disahkan",
+    verified_sellers_desc: "Program BAKAT & AIM",
+    fast_delivery: "Penghantaran Pantas",
+    fast_delivery_desc: "Seluruh Negara",
+    ai_tools: "Pembantu AI",
+    ai_tools_desc: "Alatan Perniagaan Pintar",
+    impact: "100% Impact",
+    impact_desc: "Sokong Keluarga Tempatan"
+  }
+};
+
+export default function App() {
+  const [currentView, setCurrentView] = useState('home'); // home, marketplace, product_details, cart, orders, seller_hub, ai_assistant
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
+  const [cart, setCart] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [language, setLanguage] = useState('en');
+
+  const t = TRANSLATIONS[language];
+
+  // Seller State
+  const [sellerProfile, setSellerProfile] = useState(null);
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(""), 3000);
+  };
+
+  const navigateTo = (view, product = null) => {
+    setCurrentView(view);
+    if (product) setSelectedProduct(product);
+    setIsMobileMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
+  const getProductName = (product) => {
+    return language === 'ms' && product.name_ms ? product.name_ms : product.name;
+  };
+
+  const getProductDesc = (product) => {
+    return language === 'ms' && product.description_ms ? product.description_ms : product.description;
+  };
+
+  const addToCart = (product, quantity = 1) => {
+    const existingItem = cart.find(item => item.product.id === product.id);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.product.id === product.id 
+          ? { ...item, quantity: Math.min(item.quantity + quantity, product.stock) } 
+          : item
+      ));
+    } else {
+      setCart([...cart, { product, quantity }]);
+    }
+    showToast(`${getProductName(product)} ${t.added_to_cart}`);
+  };
+
+  const updateCartQuantity = (productId, change) => {
+    setCart(cart.map(item => {
+      if (item.product.id === productId) {
+        const newQty = Math.max(1, Math.min(item.quantity + change, item.product.stock));
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }));
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(cart.filter(item => item.product.id !== productId));
+  };
+
+  const handleCheckout = (customerInfo) => {
+    const newOrder = {
+      id: `ORD-${Math.floor(Math.random() * 10000)}`,
+      date: new Date().toLocaleDateString(),
+      items: [...cart],
+      total: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
+      status: 'Processing',
+      customer: customerInfo
+    };
+    
+    setOrders([newOrder, ...orders]);
+    setCart([]);
+    navigateTo('orders');
+    showToast(t.order_placed);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'en' ? 'ms' : 'en');
+  };
+
+  const Navbar = () => (
+    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          
+          {/* Logo Group & Desktop Links */}
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center cursor-pointer" onClick={() => navigateTo('home')}>
+              <div className="bg-[#12a38b] text-white font-bold text-xl w-11 h-11 rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                CH
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="font-extrabold text-gray-900 text-lg leading-none mb-1">Commerce Hub</span>
+                <span className="text-[10px] font-bold text-[#12a38b] tracking-[0.2em] leading-none uppercase">Community Platform</span>
+              </div>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-6 pl-6 border-l border-gray-200 h-8">
+              <button onClick={() => navigateTo('home')} className={`font-semibold transition ${currentView === 'home' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
+                {t.home}
+              </button>
+              <button onClick={() => navigateTo('marketplace')} className={`font-semibold transition ${currentView === 'marketplace' ? 'text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>
+                {t.marketplace}
+              </button>
+            </div>
+          </div>
+
+          {/* Right Side Actions (Desktop) */}
+          <div className="hidden md:flex items-center space-x-4">
+            <button onClick={toggleLanguage} className="flex items-center px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-full text-sm font-medium transition border border-gray-200">
+              <Globe size={16} className="mr-1.5" /> {language === 'en' ? 'EN' : 'MS'}
+            </button>
+
+            <button onClick={() => navigateTo('cart')} className="relative p-2 text-gray-500 hover:text-gray-900 transition">
+              <ShoppingCart size={24} />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+
+            <button onClick={() => navigateTo('seller_hub')} className="flex items-center px-5 py-2 border border-gray-200 hover:border-gray-300 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-50 transition shadow-sm ml-2">
+              <User size={16} className="mr-2 text-[#12a38b]" /> {t.sell}
+            </button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex md:hidden items-center space-x-3">
+            <button onClick={toggleLanguage} className="text-gray-600 font-medium text-sm">
+              {language === 'en' ? 'EN' : 'MS'}
+            </button>
+            <button onClick={() => navigateTo('cart')} className="relative p-2 text-gray-600">
+              <ShoppingCart size={22} />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 -mt-1 -mr-1 px-1.5 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 hover:text-gray-900 p-2">
+              {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white animate-fade-in border-t border-gray-100 shadow-lg absolute w-full">
+          <div className="px-4 py-3 space-y-2">
+            <button onClick={() => navigateTo('home')} className="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 border border-transparent">
+              {t.home}
+            </button>
+            <button onClick={() => navigateTo('marketplace')} className="block w-full text-left px-3 py-3 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 border border-transparent">
+              {t.marketplace}
+            </button>
+            <button onClick={() => navigateTo('seller_hub')} className="block w-full text-left px-3 py-3 rounded-lg text-base font-bold text-[#12a38b] bg-teal-50 border border-teal-100">
+               <div className="flex items-center"><User size={18} className="mr-2" /> {t.sell}</div>
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+
+  const HomeView = () => (
+    <div className="flex flex-col min-h-screen animate-fade-in bg-gray-50/50 pb-20">
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 w-full">
+        {/* Exact Match Hero Banner */}
+        <div className="bg-gradient-to-r from-[#0a5c76] to-[#12a38b] rounded-[32px] p-8 md:p-14 lg:px-16 lg:py-20 shadow-lg mb-8 relative overflow-hidden">
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-block border border-white/30 bg-white/10 rounded-full px-4 py-1.5 text-xs font-bold text-white tracking-widest mb-6 backdrop-blur-sm">
+              {t.support_local_heroes}
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-[54px] font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
+              {t.empowering_title}
+            </h1>
+            <p className="text-white/90 text-lg md:text-xl mb-10 font-light leading-relaxed max-w-xl">
+              {t.empowering_desc}
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <button onClick={() => navigateTo('marketplace')} className="bg-white hover:bg-gray-50 text-[#0a5c76] font-bold py-3.5 px-6 rounded-xl shadow-sm transition flex items-center justify-center">
+                <ShoppingBag size={18} className="mr-2" /> {t.shop_now}
+              </button>
+              <button onClick={() => navigateTo('seller_hub')} className="border-2 border-white/90 text-white hover:bg-white/10 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center">
+                <Store size={18} className="mr-2" /> {t.become_seller_btn}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Exact Match 4-Card Features Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:-translate-y-1 transition transform">
+            <ShieldCheck size={36} className="text-blue-500 mb-4" />
+            <h3 className="font-bold text-gray-900 text-lg mb-1">{t.verified_sellers}</h3>
+            <p className="text-sm text-gray-500">{t.verified_sellers_desc}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:-translate-y-1 transition transform">
+            <Rocket size={36} className="text-[#12a38b] mb-4" />
+            <h3 className="font-bold text-gray-900 text-lg mb-1">{t.fast_delivery}</h3>
+            <p className="text-sm text-gray-500">{t.fast_delivery_desc}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:-translate-y-1 transition transform">
+            <Sparkles size={36} className="text-yellow-500 mb-4" />
+            <h3 className="font-bold text-gray-900 text-lg mb-1">{t.ai_tools}</h3>
+            <p className="text-sm text-gray-500">{t.ai_tools_desc}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 hover:-translate-y-1 transition transform">
+            <Heart size={36} className="text-red-500 mb-4 fill-current" />
+            <h3 className="font-bold text-gray-900 text-lg mb-1">{t.impact}</h3>
+            <p className="text-sm text-gray-500">{t.impact_desc}</p>
+          </div>
+        </div>
+
+        {/* Categories (Preserved from existing UI to keep app functionality) */}
+        <div className="mb-20">
+          <div className="flex justify-between items-end mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">{t.product_categories}</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {Object.keys(CATEGORIES).filter(c => c !== "All").map(catKey => (
+              <div 
+                key={catKey} 
+                onClick={() => { setSelectedCategory(catKey); navigateTo('marketplace'); }}
+                className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center cursor-pointer hover:shadow-md hover:border-emerald-300 transition transform hover:-translate-y-1 group"
+              >
+                <div className="h-14 w-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#12a38b] group-hover:text-white transition-colors duration-300">
+                  <Package size={24} />
+                </div>
+                <h3 className="font-bold text-gray-700 group-hover:text-[#12a38b]">{language === 'ms' ? CATEGORIES[catKey] : catKey}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Promotional Banner (Preserved) */}
+        <div className="mb-20 bg-gradient-to-br from-pink-500 via-red-500 to-orange-500 rounded-3xl p-8 md:p-12 text-white shadow-xl flex flex-col md:flex-row items-center justify-between relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mt-10 -mr-10 opacity-20">
+            <Tag size={200} />
+          </div>
+          <div className="relative z-10 max-w-xl mb-6 md:mb-0">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-4">{t.promo_title}</h2>
+            <p className="text-lg md:text-xl text-pink-100">{t.promo_desc}</p>
+          </div>
+          <button onClick={() => navigateTo('marketplace')} className="relative z-10 bg-white text-red-600 font-bold py-3 px-8 rounded-full shadow-md hover:shadow-lg hover:bg-gray-50 transition transform hover:scale-105 whitespace-nowrap">
+            {t.claim_offer}
+          </button>
+        </div>
+
+        {/* Featured Products (Preserved) */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">{t.featured_products}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.slice(0, 4).map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ProductCard = ({ product }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col group cursor-pointer" onClick={() => navigateTo('product_details', product)}>
+      <div className="relative h-48 overflow-hidden bg-gray-100">
+        <img src={product.image} alt={getProductName(product)} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+        <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-bold text-gray-700 flex items-center shadow-sm">
+          <Star size={12} className="text-yellow-500 mr-1" /> {product.rating}
+        </div>
+      </div>
+      <div className="p-4 flex flex-col flex-grow">
+        <div className="text-xs text-emerald-600 font-semibold mb-1 uppercase tracking-wide">
+          {language === 'ms' && CATEGORIES[product.category] ? CATEGORIES[product.category] : product.category}
+        </div>
+        <h3 className="font-bold text-gray-800 text-lg mb-1 truncate">{getProductName(product)}</h3>
+        <p className="text-gray-500 text-sm mb-3 flex-grow line-clamp-2">{getProductDesc(product)}</p>
+        <div className="flex items-center justify-between mt-auto">
+          <span className="font-bold text-xl text-gray-900">RM {product.price.toFixed(2)}</span>
+          <button 
+            onClick={(e) => { e.stopPropagation(); addToCart(product); }}
+            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 p-2 rounded-full transition"
+            title={t.add_to_cart}
+          >
+            <Plus size={20} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const MarketplaceView = () => {
+    const filteredProducts = products.filter(p => {
+      const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
+      const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (p.name_ms && p.name_ms.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCategory && matchSearch;
+    });
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">{t.marketplace}</h1>
+          
+          {/* Search Bar */}
+          <div className="relative w-full md:w-96">
+            <input 
+              type="text" 
+              placeholder={t.search_placeholder}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent shadow-sm"
+            />
+            <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+          </div>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <div className="w-full md:w-64 shrink-0">
+            <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 sticky top-24">
+              <h3 className="font-bold text-lg mb-4 border-b pb-2">{t.categories}</h3>
+              <div className="space-y-2">
+                {Object.keys(CATEGORIES).map(catKey => (
+                  <button 
+                    key={catKey}
+                    onClick={() => setSelectedCategory(catKey)}
+                    className={`block w-full text-left px-3 py-2 rounded-md transition ${selectedCategory === catKey ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}
+                  >
+                    {language === 'ms' ? CATEGORIES[catKey] : catKey}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Product Grid */}
+          <div className="flex-1">
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
+                <Package className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+                <h3 className="text-xl font-medium text-gray-500">{t.no_products}</h3>
+                <p className="text-gray-400 mt-2">{t.try_adjusting}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const ProductDetailsView = () => {
+    if (!selectedProduct) return null;
+    const [qty, setQty] = useState(1);
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+        <button onClick={() => navigateTo('marketplace')} className="text-emerald-600 hover:text-emerald-800 flex items-center mb-6 transition">
+          <ChevronRight className="rotate-180 mr-1" size={20} /> {t.back_to_marketplace}
+        </button>
+        
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col md:flex-row">
+          <div className="md:w-1/2 p-8 bg-gray-50 flex items-center justify-center">
+            <img src={selectedProduct.image} alt={getProductName(selectedProduct)} className="max-w-full h-auto max-h-96 object-contain rounded-lg shadow-md" />
+          </div>
+          <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
+            <div className="text-sm text-emerald-600 font-bold uppercase tracking-wider mb-2">
+              {language === 'ms' && CATEGORIES[selectedProduct.category] ? CATEGORIES[selectedProduct.category] : selectedProduct.category}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{getProductName(selectedProduct)}</h1>
+            
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="flex items-center text-yellow-500">
+                <Star size={18} fill="currentColor" />
+                <span className="ml-1 font-medium text-gray-700">{selectedProduct.rating} {t.rating}</span>
+              </div>
+              <span className="text-gray-300">|</span>
+              <div className="flex items-center text-gray-500">
+                <Store size={18} className="mr-1" /> {t.sold_by} <span className="font-medium text-emerald-600 ml-1">{selectedProduct.seller}</span>
+              </div>
+            </div>
+
+            <p className="text-gray-600 text-lg mb-8 leading-relaxed">{getProductDesc(selectedProduct)}</p>
+            
+            <div className="text-4xl font-extrabold text-gray-900 mb-8">
+              RM {selectedProduct.price.toFixed(2)}
+            </div>
+
+            <div className="flex items-center space-x-4 mb-8">
+              <span className="font-medium text-gray-700">{t.quantity}:</span>
+              <div className="flex items-center border border-gray-300 rounded-lg">
+                <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2 text-gray-600 hover:bg-gray-100">-</button>
+                <span className="px-4 py-2 font-medium border-x border-gray-300">{qty}</span>
+                <button onClick={() => setQty(Math.min(selectedProduct.stock, qty + 1))} className="px-4 py-2 text-gray-600 hover:bg-gray-100">+</button>
+              </div>
+              <span className="text-sm text-gray-500">{selectedProduct.stock} {t.available}</span>
+            </div>
+
+            <button 
+              onClick={() => addToCart(selectedProduct, qty)}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition flex justify-center items-center text-lg"
+            >
+              <ShoppingCart className="mr-2" /> {t.add_to_cart}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const CartView = () => {
+    const [customerInfo, setCustomerInfo] = useState({ name: '', address: '', phone: '' });
+    const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center"><ShoppingCart className="mr-3" /> {t.shopping_cart}</h1>
+        
+        {cart.length === 0 ? (
+          <div className="bg-white p-12 text-center rounded-2xl border border-gray-200 shadow-sm">
+            <ShoppingBag className="mx-auto h-20 w-20 text-gray-300 mb-4" />
+            <h2 className="text-2xl font-medium text-gray-600 mb-4">{t.cart_empty}</h2>
+            <button onClick={() => navigateTo('marketplace')} className="bg-emerald-100 text-emerald-700 font-bold py-2 px-6 rounded-lg hover:bg-emerald-200 transition">
+              {t.continue_shopping}
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                {cart.map(item => (
+                  <div key={item.product.id} className="p-6 border-b border-gray-100 flex items-center flex-col sm:flex-row gap-6 hover:bg-gray-50 transition">
+                    <img src={item.product.image} alt={getProductName(item.product)} className="w-24 h-24 object-cover rounded-lg shadow-sm" />
+                    <div className="flex-1 w-full text-center sm:text-left">
+                      <h3 className="font-bold text-lg text-gray-900">{getProductName(item.product)}</h3>
+                      <p className="text-emerald-600 font-medium">RM {item.product.price.toFixed(2)}</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center border border-gray-300 rounded-lg bg-white">
+                        <button onClick={() => updateCartQuantity(item.product.id, -1)} className="px-3 py-1 hover:bg-gray-100">-</button>
+                        <span className="px-3 py-1 font-medium border-x border-gray-300 min-w-[2rem] text-center">{item.quantity}</span>
+                        <button onClick={() => updateCartQuantity(item.product.id, 1)} className="px-3 py-1 hover:bg-gray-100">+</button>
+                      </div>
+                      <button onClick={() => removeFromCart(item.product.id)} className="text-red-500 hover:text-red-700 p-2 bg-red-50 rounded-full">
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="w-full lg:w-96">
+              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm sticky top-24">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 border-b pb-4">{t.order_summary}</h3>
+                <div className="flex justify-between mb-2 text-gray-600">
+                  <span>{t.subtotal}</span>
+                  <span>RM {total.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between mb-4 text-gray-600">
+                  <span>{t.shipping}</span>
+                  <span>{t.free}</span>
+                </div>
+                <div className="flex justify-between font-bold text-2xl text-gray-900 border-t pt-4 mb-6">
+                  <span>{t.total}</span>
+                  <span>RM {total.toFixed(2)}</span>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <h4 className="font-medium text-gray-700">{t.shipping_info}</h4>
+                  <input type="text" placeholder={t.full_name} value={customerInfo.name} onChange={e => setCustomerInfo({...customerInfo, name: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+                  <textarea placeholder={t.delivery_address} value={customerInfo.address} onChange={e => setCustomerInfo({...customerInfo, address: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500 outline-none rows-2"></textarea>
+                  <input type="tel" placeholder={t.phone_number} value={customerInfo.phone} onChange={e => setCustomerInfo({...customerInfo, phone: e.target.value})} className="w-full px-4 py-2 border rounded-lg focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+                </div>
+
+                <button 
+                  onClick={() => handleCheckout(customerInfo)}
+                  disabled={!customerInfo.name || !customerInfo.address}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-xl shadow transition"
+                >
+                  {t.confirm_checkout}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const OrdersView = () => (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center"><Package className="mr-3" /> {t.order_history}</h1>
+      
+      {orders.length === 0 ? (
+        <div className="bg-white p-12 text-center rounded-2xl border border-gray-200 shadow-sm">
+          <Info className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+          <h2 className="text-xl font-medium text-gray-600">{t.no_orders}</h2>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {orders.map(order => (
+            <div key={order.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
+                <div>
+                  <span className="text-sm text-gray-500">{t.order_id}: </span>
+                  <span className="font-bold text-gray-900">{order.id}</span>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500">{t.date}: </span>
+                  <span className="font-medium text-gray-900">{order.date}</span>
+                </div>
+                <div>
+                  <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium flex items-center">
+                    <CheckCircle size={14} className="mr-1" /> {order.status}
+                  </span>
+                </div>
+                <div className="font-bold text-lg text-emerald-600">RM {order.total.toFixed(2)}</div>
+              </div>
+              <div className="p-6">
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-2">{t.items}</h4>
+                  <ul className="space-y-2">
+                    {order.items.map((item, idx) => (
+                      <li key={idx} className="flex justify-between text-gray-600 border-b border-dashed border-gray-200 pb-2">
+                        <span>{item.quantity}x {getProductName(item.product)}</span>
+                        <span>RM {(item.product.price * item.quantity).toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg text-sm text-gray-600">
+                  <span className="font-bold text-gray-800">{t.delivering_to}: </span>
+                  {order.customer.name}, {order.customer.address} ({order.customer.phone})
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const SellerHubView = () => {
+    const [regForm, setRegForm] = useState({ type: 'BAKAT', storeName: '', photo: '' });
+    const [editingProduct, setEditingProduct] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // Product form state
+    const [prodForm, setProdForm] = useState({ id: null, name: '', name_ms: '', description: '', description_ms: '', category: 'Clothing', price: '', stock: '', image: '' });
+
+    const handleRegister = (e) => {
+      e.preventDefault();
+      setSellerProfile({ ...regForm, joined: new Date().toLocaleDateString() });
+      showToast(t.store_registered);
+    };
+
+    const handleSaveProduct = (e) => {
+      e.preventDefault();
+      const newProd = {
+        ...prodForm,
+        id: prodForm.id || Math.random(),
+        price: parseFloat(prodForm.price),
+        stock: parseInt(prodForm.stock, 10),
+        seller: sellerProfile.storeName,
+        rating: 5.0
+      };
+
+      if (editingProduct) {
+        setProducts(products.map(p => p.id === newProd.id ? newProd : p));
+        showToast(t.product_updated);
+      } else {
+        setProducts([newProd, ...products]);
+        showToast(t.product_added);
+      }
+      setIsModalOpen(false);
+    };
+
+    const deleteProduct = (id) => {
+      setProducts(products.filter(p => p.id !== id));
+      showToast(t.product_deleted);
+    };
+
+    const openModal = (product = null) => {
+      if (product) {
+        setEditingProduct(true);
+        setProdForm({ ...product, name_ms: product.name_ms || '', description_ms: product.description_ms || '' });
+      } else {
+        setEditingProduct(false);
+        setProdForm({ id: null, name: '', name_ms: '', description: '', description_ms: '', category: 'Clothing', price: '', stock: '', image: '' });
+      }
+      setIsModalOpen(true);
+    };
+
+    if (!sellerProfile) {
+      return (
+        <div className="max-w-3xl mx-auto px-4 py-12 animate-fade-in">
+          <div className="bg-white p-8 md:p-12 rounded-2xl shadow-lg border border-gray-100 text-center">
+            <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Store size={40} />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.become_seller}</h1>
+            <p className="text-gray-500 mb-8">{t.join_desc}</p>
+            
+            <form onSubmit={handleRegister} className="text-left space-y-6 max-w-md mx-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.seller_type}</label>
+                <select 
+                  value={regForm.type} 
+                  onChange={e => setRegForm({...regForm, type: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                >
+                  <option value="BAKAT">BAKAT</option>
+                  <option value="AIM Entrepreneur">AIM Entrepreneur</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.store_name}</label>
+                <input 
+                  type="text" required
+                  value={regForm.storeName} 
+                  onChange={e => setRegForm({...regForm, storeName: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  placeholder="e.g. Kedai Kraf Ali"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t.profile_photo}</label>
+                <input 
+                  type="url"
+                  value={regForm.photo} 
+                  onChange={e => setRegForm({...regForm, photo: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                  placeholder="https://..."
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                {t.register_store}
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    const myProducts = products.filter(p => p.seller === sellerProfile.storeName);
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-in">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-emerald-900 text-white p-8 rounded-2xl shadow-md">
+          <div className="flex items-center gap-6 mb-4 md:mb-0">
+            <div className="w-20 h-20 bg-emerald-200 rounded-full overflow-hidden border-4 border-emerald-400">
+              {sellerProfile.photo ? (
+                <img src={sellerProfile.photo} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User size={40} className="w-full h-full p-4 text-emerald-700" />
+              )}
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">{sellerProfile.storeName}</h1>
+              <p className="text-emerald-200">{sellerProfile.type} • Joined {sellerProfile.joined}</p>
+            </div>
+          </div>
+          <button onClick={() => openModal()} className="bg-white text-emerald-900 hover:bg-gray-100 font-bold py-3 px-6 rounded-xl shadow transition flex items-center">
+            <Plus className="mr-2" /> {t.add_new_product}
+          </button>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-xl font-bold text-gray-800">{t.my_products} ({myProducts.length})</h2>
+          </div>
+          
+          {myProducts.length === 0 ? (
+            <div className="p-12 text-center">
+              <Package className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+              <p className="text-gray-500 text-lg">{t.no_added_products}</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-white border-b border-gray-200 text-gray-500 text-sm uppercase tracking-wider">
+                    <th className="p-4 font-medium">{t.product}</th>
+                    <th className="p-4 font-medium">{t.category}</th>
+                    <th className="p-4 font-medium">{t.price} (RM)</th>
+                    <th className="p-4 font-medium">{t.stock}</th>
+                    <th className="p-4 font-medium text-right">{t.actions}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {myProducts.map(p => (
+                    <tr key={p.id} className="hover:bg-gray-50 transition">
+                      <td className="p-4 flex items-center gap-4">
+                        <img src={p.image} alt={getProductName(p)} className="w-12 h-12 rounded object-cover border" />
+                        <span className="font-medium text-gray-900">{getProductName(p)}</span>
+                      </td>
+                      <td className="p-4 text-gray-600">{language === 'ms' && CATEGORIES[p.category] ? CATEGORIES[p.category] : p.category}</td>
+                      <td className="p-4 text-gray-900 font-medium">{p.price.toFixed(2)}</td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${p.stock > 10 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {p.stock}
+                        </span>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button onClick={() => openModal(p)} className="text-blue-600 hover:text-blue-800 p-2"><Edit size={18}/></button>
+                        <button onClick={() => deleteProduct(p.id)} className="text-red-600 hover:text-red-800 p-2 ml-2"><Trash2 size={18}/></button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Product Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in">
+              <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50 sticky top-0 z-10">
+                <h3 className="text-xl font-bold text-gray-800">{editingProduct ? t.edit_product : t.add_new_product}</h3>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-gray-700"><X size={24}/></button>
+              </div>
+              <form onSubmit={handleSaveProduct} className="p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.product_name} (EN)</label>
+                    <input type="text" required value={prodForm.name} onChange={e => setProdForm({...prodForm, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" />
+                  </div>
+                  <div className="col-span-2 md:col-span-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.product_name} (MS)</label>
+                    <input type="text" value={prodForm.name_ms} onChange={e => setProdForm({...prodForm, name_ms: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" placeholder="Optional" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.description} (EN)</label>
+                    <textarea required rows="2" value={prodForm.description} onChange={e => setProdForm({...prodForm, description: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500"></textarea>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.description} (MS)</label>
+                    <textarea rows="2" value={prodForm.description_ms} onChange={e => setProdForm({...prodForm, description_ms: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" placeholder="Optional"></textarea>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.category}</label>
+                    <select value={prodForm.category} onChange={e => setProdForm({...prodForm, category: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500">
+                      {Object.keys(CATEGORIES).filter(c => c !== 'All').map(c => <option key={c} value={c}>{language === 'ms' ? CATEGORIES[c] : c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.price} (RM)</label>
+                    <input type="number" step="0.01" required value={prodForm.price} onChange={e => setProdForm({...prodForm, price: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.stock}</label>
+                    <input type="number" required value={prodForm.stock} onChange={e => setProdForm({...prodForm, stock: e.target.value})} className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t.image_url}</label>
+                    <input type="url" required value={prodForm.image} onChange={e => setProdForm({...prodForm, image: e.target.value})} placeholder="https://..." className="w-full px-3 py-2 border rounded-lg outline-none focus:ring-emerald-500" />
+                  </div>
+                </div>
+                <div className="pt-4 flex justify-end gap-3 border-t mt-6">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">{t.cancel}</button>
+                  <button type="submit" className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition">{t.save_product}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const AIAssistantView = () => {
+    const [inputName, setInputName] = useState("");
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [result, setResult] = useState(null);
+
+    const generateAIContent = (e) => {
+      e.preventDefault();
+      if (!inputName.trim()) return;
+      
+      setIsGenerating(true);
+      setResult(null);
+
+      // Simulating AI generation delay
+      setTimeout(() => {
+        const keyword = inputName.toLowerCase();
+        let cat = "Product";
+        let cat_ms = "Produk";
+        if (keyword.includes("shirt") || keyword.includes("dress") || keyword.includes("kemeja") || keyword.includes("baju")) { cat = "Fashion"; cat_ms = "Fesyen"; }
+        if (keyword.includes("sambal") || keyword.includes("food") || keyword.includes("cake") || keyword.includes("makanan") || keyword.includes("kek")) { cat = "Food"; cat_ms = "Makanan"; }
+
+        setResult({
+          title: `Premium ${inputName.charAt(0).toUpperCase() + inputName.slice(1)} - High Quality`,
+          title_ms: `${inputName.charAt(0).toUpperCase() + inputName.slice(1)} Premium - Kualiti Tinggi`,
+          description: `Discover the perfect blend of quality and utility with our latest ${inputName}. Carefully crafted to meet your daily needs, this product ensures maximum satisfaction and durability. Upgrade your lifestyle today!`,
+          description_ms: `Temui gabungan sempurna kualiti dan utiliti dengan ${inputName} terbaru kami. Dihasilkan dengan teliti untuk memenuhi keperluan harian anda, produk ini memastikan kepuasan dan ketahanan maksimum. Tingkatkan gaya hidup anda hari ini!`,
+          price: `RM ${(Math.random() * 50 + 10).toFixed(2)}`,
+          caption: `Ready to elevate your ${cat.toLowerCase()} game? 🌟 Check out our amazing new ${inputName}! Limited stock available. #SupportLocal #MustHave`,
+          caption_ms: `Bersedia untuk meningkatkan gaya ${cat_ms.toLowerCase()} anda? 🌟 Lihat ${inputName} baru kami yang menakjubkan! Stok terhad. #SokongLokal #WajibBeli`,
+          seo: `${inputName}, buy ${inputName} online, best ${inputName} malaysia, premium ${cat.toLowerCase()}, affordable ${inputName}`,
+          hashtags: `#${inputName.replace(/\s+/g, '')} #${cat} #CommunityHub #SokongLokal #SupportLocalHeroes #Trending`
+        });
+        setIsGenerating(false);
+      }, 1500);
+    };
+
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 animate-fade-in">
+        <div className="text-center mb-10">
+          <div className="inline-block p-4 bg-purple-100 text-purple-600 rounded-full mb-4">
+            <Sparkles size={40} />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">{t.ai_title}</h1>
+          <p className="text-gray-600 text-lg">{t.ai_desc}</p>
+        </div>
+
+        <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 mb-8">
+          <form onSubmit={generateAIContent} className="flex flex-col md:flex-row gap-4">
+            <input 
+              type="text" 
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
+              placeholder={t.ai_placeholder}
+              className="flex-1 px-4 py-4 border border-gray-300 rounded-xl focus:ring-purple-500 focus:border-purple-500 text-lg outline-none"
+              required
+            />
+            <button 
+              type="submit" 
+              disabled={isGenerating}
+              className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-bold py-4 px-8 rounded-xl shadow-md transition flex items-center justify-center min-w-[200px]"
+            >
+              {isGenerating ? (
+                <span className="flex items-center"><div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div> {t.generating}</span>
+              ) : (
+                <span className="flex items-center"><Sparkles className="mr-2"/> {t.generate_magic}</span>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {result && (
+          <div className="bg-gradient-to-br from-emerald-50 to-purple-50 p-8 rounded-2xl border border-purple-100 shadow-inner animate-fade-in">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+              <CheckCircle className="text-green-500 mr-2" /> {t.generated_content}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.product_title}</span>
+                <p className="font-bold text-gray-900 text-lg">{language === 'ms' ? result.title_ms : result.title}</p>
+              </div>
+              
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.suggested_price}</span>
+                <p className="font-bold text-gray-900 text-lg">{result.price}</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.description}</span>
+                <p className="text-gray-700">{language === 'ms' ? result.description_ms : result.description}</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.marketing_caption}</span>
+                <p className="text-gray-700 italic">{language === 'ms' ? result.caption_ms : result.caption}</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.seo_keywords}</span>
+                <p className="text-gray-600 text-sm">{result.seo}</p>
+              </div>
+
+              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                <span className="text-xs font-bold text-purple-500 uppercase tracking-wider block mb-1">{t.hashtags}</span>
+                <p className="text-blue-600 text-sm font-medium">{result.hashtags}</p>
+              </div>
+            </div>
+            
+            <div className="mt-8 text-center">
+               <button onClick={() => {
+                   setProdForm({ 
+                     id: null, 
+                     name: result.title, 
+                     name_ms: result.title_ms,
+                     description: result.description, 
+                     description_ms: result.description_ms,
+                     category: 'Clothing', 
+                     price: result.price.replace('RM ',''), 
+                     stock: '10', 
+                     image: '' 
+                   });
+                   navigateTo('seller_hub');
+                   showToast(t.content_copied);
+               }} className="bg-white border-2 border-purple-600 text-purple-700 hover:bg-purple-50 font-bold py-2 px-6 rounded-lg transition">
+                 {t.use_in_new_product}
+               </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900 flex flex-col">
+      <Navbar />
+      
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-2xl z-50 animate-fade-in flex items-center">
+          <CheckCircle size={20} className="mr-2 text-green-400" />
+          {toastMessage}
+        </div>
+      )}
+
+      {/* Main Content Area */}
+      <main className="flex-grow">
+        {currentView === 'home' && <HomeView />}
+        {currentView === 'marketplace' && <MarketplaceView />}
+        {currentView === 'product_details' && <ProductDetailsView />}
+        {currentView === 'cart' && <CartView />}
+        {currentView === 'orders' && <OrdersView />}
+        {currentView === 'seller_hub' && <SellerHubView />}
+        {currentView === 'ai_assistant' && <AIAssistantView />}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12 text-center mt-auto">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-center mb-4 text-white">
+            <Store className="h-6 w-6 mr-2" />
+            <span className="font-bold text-xl tracking-wide">Community Hub</span>
+          </div>
+          <p className="mb-4">{t.footer_desc}</p>
+          <div className="flex justify-center space-x-6 text-sm">
+            <a href="#" className="hover:text-white transition">{t.about_us}</a>
+            <a href="#" className="hover:text-white transition">{t.terms}</a>
+            <a href="#" className="hover:text-white transition">{t.privacy}</a>
+          </div>
+          <p className="mt-8 text-xs text-gray-600">&copy; {new Date().getFullYear()} Community Hub. {t.all_rights}</p>
+        </div>
+      </footer>
+
+      {/* Basic Custom Styles for Animations */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}} />
+    </div>
+  );
+}
